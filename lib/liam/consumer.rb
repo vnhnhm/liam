@@ -4,9 +4,7 @@ require 'liam/common'
 
 module Liam
   class Consumer
-    SQS_QUEUE = "#"
-
-    include Common
+    include Liam::Common
 
     def self.message(*args)
       new(*args).send(:execute)
@@ -24,11 +22,16 @@ module Liam
       puts 'Fatal Error...'
     end
 
+    def sqs_queue
+      @sqs_queue ||= liam_yaml['aws']['sqs_queue']
+    end
+
     def poller
-      @poller ||= Aws::SQS::QueuePoller.new(SQS_QUEUE, client: sqs_client)
+      @poller ||= Aws::SQS::QueuePoller.new(sqs_queue, client: sqs_client)
     end
 
     def process_message
+      byebug
       create_topic_class
       # call_class
       # delete_message
